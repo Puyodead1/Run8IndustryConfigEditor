@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Run8IndustryConfigEditor
 {
-	internal enum ECarType
+	public enum ECarType
 	{
 		All,
 		AcidTank,

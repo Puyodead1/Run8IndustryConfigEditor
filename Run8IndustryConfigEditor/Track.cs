@@ -1,6 +1,6 @@
 ﻿namespace Run8IndustryConfigEditor
 {
-    internal class Track
+    public class Track
     {
         public Track(BinaryReader binaryReader)
         {

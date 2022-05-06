@@ -1,6 +1,6 @@
 ﻿namespace Run8IndustryConfigEditor
 {
-    internal class Car
+    public class Car
     {
         public Car(BinaryReader binaryReader)
         {

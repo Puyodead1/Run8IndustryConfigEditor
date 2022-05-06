@@ -1,6 +1,6 @@
 ﻿namespace Run8IndustryConfigEditor
 {
-    internal class Industry
+    public class Industry
     {
         public Industry(BinaryReader binaryReader)
         {

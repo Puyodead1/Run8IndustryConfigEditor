@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Run8IndustryConfigEditor
 {
-    internal class IndustryConfiguration
+    public class IndustryConfiguration
     {
 
         public IndustryConfiguration(string filePath)
