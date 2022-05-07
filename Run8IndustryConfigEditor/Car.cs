@@ -29,7 +29,7 @@
                 //System.Diagnostics.Debug.WriteLine($"num2: {num2}");
                 for (int j = 0; j < num2; j++)
                 {
-                    //System.Diagnostics.Debug.WriteLine($"Unknown String j{j}: {IndustryConfiguration.ReadString(binaryReader)}");
+                    System.Diagnostics.Debug.WriteLine($"Unknown String j{j}: {IndustryConfiguration.ReadString(binaryReader)}");
                 }
             }
         }

@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	<Copyright>© Puyodead1 2022</Copyright>
+	<Title>RICE</Title>
+	<Product>RICE - Run8 Industry Configuration Editor</Product>
+	<Version>0.0.1-DEV</Version>
+	<Description>TODO</Description>
   </PropertyGroup>
 
 </Project>

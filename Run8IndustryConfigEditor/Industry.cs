@@ -2,11 +2,14 @@
 {
     public class Industry
     {
-        public Industry(BinaryReader binaryReader)
+        public Industry(BinaryReader binaryReader, Label label)
         {
             // skip 4 bytes
             binaryReader.ReadInt32();
             Name = IndustryConfiguration.ReadString(binaryReader);
+            Application.OpenForms[0].Invoke(delegate {
+                label.Text = $"Loading industry {Name}";
+            });
             //System.Diagnostics.Debug.WriteLine($"Name: {Name}");
             LocalFreightCode = IndustryConfiguration.ReadString(binaryReader);
             //System.Diagnostics.Debug.WriteLine($"LocalFreightCode: {LocalFreightCode}");

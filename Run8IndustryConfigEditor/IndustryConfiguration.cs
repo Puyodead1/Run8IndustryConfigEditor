@@ -10,7 +10,7 @@ namespace Run8IndustryConfigEditor
     public class IndustryConfiguration
     {
 
-        public IndustryConfiguration(string filePath)
+        public IndustryConfiguration(string filePath,ProgressBar progressBar, Label label)
         {
             using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -20,11 +20,17 @@ namespace Run8IndustryConfigEditor
                     binaryReader.ReadInt32();
                     // read number of industries
                     IndustryCount = binaryReader.ReadInt32();
+                    Application.OpenForms[0].BeginInvoke(delegate {
+                        progressBar.Maximum = IndustryCount;
+                    });
                     //System.Diagnostics.Debug.WriteLine($"IndustryCount: {IndustryCount}");
                     this.Industries = new List<Industry>(IndustryCount);
                     for (int i = 0; i < IndustryCount; i++)
                     {
-                        Industries.Add(new Industry(binaryReader));
+                        Industries.Add(new Industry(binaryReader, label));
+                        Application.OpenForms[0].BeginInvoke(delegate {
+                            progressBar.PerformStep();
+                        });
                     }
 
                     //System.Diagnostics.Debug.WriteLine($"Loaded {Industries.Count} industries");

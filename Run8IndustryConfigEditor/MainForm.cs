@@ -4,12 +4,17 @@ namespace Run8IndustryConfigEditor
 {
     public partial class MainForm : Form
     {
+        public string? filePath;
+        public IndustryConfiguration? IndustryConfiguration;
         public MainForm()
         {
             InitializeComponent();
             SetupGrids();
         }
 
+        /*
+         * Sets up common grid view styling
+         */
         private void SetupGrids()
         {
             panelData.SplitterDistance = this.Width / 2;
@@ -20,7 +25,7 @@ namespace Run8IndustryConfigEditor
             industryGrid.ColumnHeadersDefaultCellStyle.Font =
             new Font(industryGrid.Font, FontStyle.Bold);
 
-            industryGrid.Name = "Industries";
+            industryGrid.Name = "industries";
             industryGrid.Location = new Point(8, 8);
             industryGrid.Size = new Size(panelData.Panel1.Width, panelData.Panel1.Height);
             industryGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
@@ -40,7 +45,7 @@ namespace Run8IndustryConfigEditor
             editingPanel.ColumnHeadersDefaultCellStyle.Font =
             new Font(editingPanel.Font, FontStyle.Bold);
 
-            editingPanel.Name = "EditingGrid";
+            editingPanel.Name = "editingGrid";
             editingPanel.Location = new Point(8, 8);
             editingPanel.Size = new Size(panelData.Panel2.Width, panelData.Panel2.Height);
             editingPanel.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
@@ -54,6 +59,9 @@ namespace Run8IndustryConfigEditor
             editingPanel.Dock = DockStyle.Fill;
         }
 
+        /*
+         * Creates the industry grid columns
+         */
         private void SetupIndustryGrid()
         {
             DataGridViewButtonColumn trackEditBtnCol = new DataGridViewButtonColumn();
@@ -85,14 +93,23 @@ namespace Run8IndustryConfigEditor
             industryGrid.Columns.Add(deleteRowBtnCol);
         }
 
-        private void SetupCarEditor(Industry industry)
+        private void ResetEditingPanel()
         {
             // clear any existing data
             editingPanel.Columns.Clear();
             editingPanel.Rows.Clear();
             editingPanel.ClearSelection();
+        }
 
-            editingPanel.Name = "Cars";
+        /*
+         * Creates the editing panel columns for car editing and populates the data
+         */
+        private void SetupCarEditor(Industry industry)
+        {
+            // clear any existing data
+            ResetEditingPanel();
+
+            editingPanel.Name = "cars";
             editingPanel.Columns.Add("carType", "Type");
             editingPanel.Columns.Add("time", "Time");
             editingPanel.Columns.Add("capacity", "Capacity");
@@ -114,21 +131,65 @@ namespace Run8IndustryConfigEditor
                 editingPanel.Rows.Add(s);
             }
 
-            int columnCount = editingPanel.Columns.Count;
+            SizeDataGrid(editingPanel);
+            editingPanelGroupBox.Text = $"Cars for {industry.Name}";
+            editingPanelGroupBox.Visible = true;
+        }
 
-            //If we want the last column to fill the remaining space
-            int lastColumnIndex = columnCount - 1;
+        /*
+         * Sets up the editing panel columns for track editing and populates the data
+         */
+        private void SetupTrackEditor(Industry industry)
+        {
+            // clear any existing data
+            ResetEditingPanel();
 
-            //Loop through each column and set the DataGridViewAutoSizeColumnMode
-            //In this case, if we will set the size of all columns automatically, but have
-            //the last column fill any extra space available.
-            foreach (DataGridViewColumn column in editingPanel.Columns)
+            editingPanel.Name = "tracks";
+            editingPanel.Columns.Add("prefix", "Prefix");
+            editingPanel.Columns.Add("section", "Section");
+            editingPanel.Columns.Add("node", "Node");
+
+            for (int i = 0; i < industry.TrackCount; i++)
             {
-                if (column.Index == columnCount - lastColumnIndex) //Last column will fill extra space
+                Track track = industry.Tracks[i];
+
+                string[] s =
+                {
+                    track.Prefix.ToString(),
+                    track.Section.ToString(),
+                    track.Node.ToString(),
+                };
+                editingPanel.Rows.Add(s);
+            }
+
+            SizeDataGrid(editingPanel);
+            editingPanelGroupBox.Text = $"Tracks for {industry.Name}";
+            editingPanelGroupBox.Visible = true;
+        }
+
+        private void ClearGrids()
+        {
+            industryGrid.Columns.Clear();
+            industryGrid.Rows.Clear();
+            editingPanel.Columns.Clear();
+            editingPanel.Rows.Clear();
+            editingPanelGroupBox.Visible = false;
+        }
+
+        /*
+         * Makes datagrid use the full width of its container
+         */
+        private void SizeDataGrid(DataGridView dataGrid)
+        {
+            int columnCount = dataGrid.Columns.Count;
+            int lastColumnIndex = columnCount - 1;
+            foreach (DataGridViewColumn column in dataGrid.Columns)
+            {
+                if (column.Index == columnCount - lastColumnIndex)
                 {
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
-                else //Any other column will be sized based on the max content size
+                else
                 {
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 }
@@ -138,60 +199,54 @@ namespace Run8IndustryConfigEditor
         private void button1_Click(object sender, EventArgs e)
         {
             btnLoadFile.Enabled = false;
-            if(openFileDialog.ShowDialog(this) != DialogResult.OK)
+            progressBar1.Visible = true;
+            label1.Visible = true;
+            if (openFileDialog.ShowDialog(this) != DialogResult.OK)
             {
                 btnLoadFile.Enabled = true;
+                progressBar1.Visible = false;
+                label1.Visible = false;
             }
         }
 
         private void LoadFile()
         {
-            DataContext.IndustryConfiguration = new IndustryConfiguration(openFileDialog.FileName);
+            if (filePath == null) return;
+            IndustryConfiguration = new IndustryConfiguration(filePath, progressBar1, label1);
             BeginInvoke((ThreadStart)(() =>
             {
-                labelLoadingFile.Text = "Loading Complete";
 
+                ClearGrids();
                 SetupIndustryGrid();
 
                 panelData.Visible = true;
                 panelLoadFile.Visible = false;
 
-                foreach (Industry industry in DataContext.IndustryConfiguration.Industries)
+                foreach (Industry industry in IndustryConfiguration.Industries)
                 {
 
                     string[] row = { industry.Tag, industry.Name, industry.LocalFreightCode, industry.TrackCount.ToString(), industry.CarCount.ToString() };
                     industryGrid.Rows.Add(row);
                 }
 
-                int columnCount = industryGrid.Columns.Count;
+                SizeDataGrid(industryGrid);
 
-                //If we want the last column to fill the remaining space
-                int lastColumnIndex = columnCount - 1;
-
-                //Loop through each column and set the DataGridViewAutoSizeColumnMode
-                //In this case, if we will set the size of all columns automatically, but have
-                //the last column fill any extra space available.
-                foreach (DataGridViewColumn column in industryGrid.Columns)
-                {
-                    if (column.Index == columnCount - lastColumnIndex) //Last column will fill extra space
-                    {
-                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    }
-                    else //Any other column will be sized based on the max content size
-                    {
-                        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    }
-                }
+                btnLoadFile.Enabled = true;
+                progressBar1.Value = 0;
+                progressBar1.Visible = false;
+                label1.Text = "Loading...";
+                label1.Visible = false;
             }));
         }
 
         private void openFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            btnLoadFile.Enabled = false;
-            labelLoadingFile.Visible = true;
-
             try
             {
+                btnLoadFile.Enabled = false;
+                progressBar1.Visible = true;
+                label1.Visible = true;
+                filePath = openFileDialog.FileName;
                 var thread = new Thread(LoadFile) { IsBackground = true };
                 thread.Start();
             } catch(Exception ex)
@@ -202,6 +257,11 @@ namespace Run8IndustryConfigEditor
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if(IndustryConfiguration == null)
+            {
+                System.Diagnostics.Debug.WriteLine("IndustryConfiguration was null somehow..");
+                return;
+            }
             int editCarIndex = industryGrid.Columns["editCars"].Index;
             int editTracksIndex = industryGrid.Columns["editTracks"].Index;
             int deleteIndex = industryGrid.Columns["deleteRow"].Index;
@@ -209,16 +269,13 @@ namespace Run8IndustryConfigEditor
             // ignore cells that arent button cells
             if (e.RowIndex < 0 || (e.ColumnIndex != editCarIndex && e.ColumnIndex != editTracksIndex && e.ColumnIndex != deleteIndex)) return;
 
-            Industry industry = DataContext.IndustryConfiguration.Industries[e.RowIndex];
+            Industry industry = IndustryConfiguration.Industries[e.RowIndex];
 
             if(e.ColumnIndex == editTracksIndex)
             {
-                TrackEditorForm editorForm = new TrackEditorForm(industry);
-                editorForm.ShowDialog();
+                SetupTrackEditor(industry);
             } else if (e.ColumnIndex == editCarIndex)
             {
-                //CarEditorForm editorForm = new CarEditorForm(industry);
-                //editorForm.ShowDialog();
                 SetupCarEditor(industry);
             } else if (e.ColumnIndex == deleteIndex)
             {
@@ -232,6 +289,69 @@ namespace Run8IndustryConfigEditor
             {
                 MessageBox.Show($"invalid operation x_x");
             }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearGrids();
+            panelLoadFile.Visible = true;
+            panelData.Visible = false;
+            if (openFileDialog.ShowDialog(this) != DialogResult.OK)
+            {
+                btnLoadFile.Enabled = true;
+            }
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearGrids();
+            panelLoadFile.Visible = true;
+            panelData.Visible = false;
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutBox aboutBox = new AboutBox();
+            aboutBox.ShowDialog(this);
+        }
+
+        private void panelLoadFile_VisibleChanged(object sender, EventArgs e)
+        {
+            if(!panelLoadFile.Visible)
+            {
+                // show the toolstrip when not on main screen
+                toolStrip1.Visible = true;
+            } else
+            {
+                // hide toolstrip when showing main screen
+                toolStrip1.Visible = false;
+            }
+        }
+
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data == null) return;
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            filePath = files[0];
+            btnLoadFile.Enabled = false;
+            progressBar1.Visible = true;
+            label1.Visible = true;
+
+            try
+            {
+                var thread = new Thread(LoadFile) { IsBackground = true };
+                thread.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error", ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if(e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
     }
 }
