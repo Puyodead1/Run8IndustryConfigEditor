@@ -5,7 +5,7 @@ namespace Run8IndustryConfigEditor
     public partial class MainForm : Form
     {
         public string? filePath;
-        public IndustryConfiguration? IndustryConfiguration;
+        public IndustryConfiguration? industryConfiguration;
         public MainForm()
         {
             InitializeComponent();
@@ -212,7 +212,7 @@ namespace Run8IndustryConfigEditor
         private void LoadFile()
         {
             if (filePath == null) return;
-            IndustryConfiguration = new IndustryConfiguration(filePath, progressBar1, label1);
+            industryConfiguration = new IndustryConfiguration(filePath, progressBar1, label1);
             BeginInvoke((ThreadStart)(() =>
             {
 
@@ -222,7 +222,7 @@ namespace Run8IndustryConfigEditor
                 panelData.Visible = true;
                 panelLoadFile.Visible = false;
 
-                foreach (Industry industry in IndustryConfiguration.Industries)
+                foreach (Industry industry in industryConfiguration.Industries)
                 {
 
                     string[] row = { industry.Tag, industry.Name, industry.LocalFreightCode, industry.TrackCount.ToString(), industry.CarCount.ToString() };
@@ -257,7 +257,7 @@ namespace Run8IndustryConfigEditor
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if(IndustryConfiguration == null)
+            if(industryConfiguration == null)
             {
                 System.Diagnostics.Debug.WriteLine("IndustryConfiguration was null somehow..");
                 return;
@@ -269,7 +269,7 @@ namespace Run8IndustryConfigEditor
             // ignore cells that arent button cells
             if (e.RowIndex < 0 || (e.ColumnIndex != editCarIndex && e.ColumnIndex != editTracksIndex && e.ColumnIndex != deleteIndex)) return;
 
-            Industry industry = IndustryConfiguration.Industries[e.RowIndex];
+            Industry industry = industryConfiguration.Industries[e.RowIndex];
 
             if(e.ColumnIndex == editTracksIndex)
             {
@@ -282,7 +282,10 @@ namespace Run8IndustryConfigEditor
                 DialogResult res = MessageBox.Show("you won't be able to undo it without loosing your changes", "are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 if(res == DialogResult.Yes)
                 {
+                    // remove from grid
                     industryGrid.Rows.RemoveAt(e.RowIndex);
+                    // remove from industry config
+                    industryConfiguration.Industries.RemoveAt(e.ColumnIndex);
                 }
             } 
             else
@@ -352,6 +355,33 @@ namespace Run8IndustryConfigEditor
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
             if(e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if(industryConfiguration != null)
+                {
+                    // save the file
+                    try
+                    {
+                        var thread = new Thread(delegate ()
+                        {
+                            industryConfiguration.SaveFile(saveFileDialog1.FileName);
+                        })
+                        { IsBackground = true};
+                        thread.Start();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error", ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                } else
+                {
+                    MessageBox.Show("Oops", "There is nothing to save...", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
         }
     }
 }

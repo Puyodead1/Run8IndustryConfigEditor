@@ -45,7 +45,9 @@
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.panelLoadFile.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.industryGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.editingPanel)).BeginInit();
@@ -75,9 +77,9 @@
             this.panelLoadFile.Controls.Add(this.progressBar1);
             this.panelLoadFile.Controls.Add(this.btnLoadFile);
             this.panelLoadFile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelLoadFile.Location = new System.Drawing.Point(0, 0);
+            this.panelLoadFile.Location = new System.Drawing.Point(0, 25);
             this.panelLoadFile.Name = "panelLoadFile";
-            this.panelLoadFile.Size = new System.Drawing.Size(1064, 561);
+            this.panelLoadFile.Size = new System.Drawing.Size(1064, 536);
             this.panelLoadFile.TabIndex = 1;
             this.panelLoadFile.VisibleChanged += new System.EventHandler(this.panelLoadFile_VisibleChanged);
             // 
@@ -144,14 +146,14 @@
             this.editingPanel.Location = new System.Drawing.Point(3, 19);
             this.editingPanel.Name = "editingPanel";
             this.editingPanel.RowTemplate.Height = 25;
-            this.editingPanel.Size = new System.Drawing.Size(495, 539);
+            this.editingPanel.Size = new System.Drawing.Size(495, 514);
             this.editingPanel.TabIndex = 1;
             // 
             // panelData
             // 
             this.panelData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelData.IsSplitterFixed = true;
-            this.panelData.Location = new System.Drawing.Point(0, 0);
+            this.panelData.Location = new System.Drawing.Point(0, 25);
             this.panelData.Name = "panelData";
             // 
             // panelData.Panel1
@@ -161,7 +163,7 @@
             // panelData.Panel2
             // 
             this.panelData.Panel2.Controls.Add(this.editingPanelGroupBox);
-            this.panelData.Size = new System.Drawing.Size(1064, 561);
+            this.panelData.Size = new System.Drawing.Size(1064, 536);
             this.panelData.SplitterDistance = 559;
             this.panelData.TabIndex = 2;
             this.panelData.Visible = false;
@@ -172,7 +174,7 @@
             this.industryListGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.industryListGroupBox.Location = new System.Drawing.Point(0, 0);
             this.industryListGroupBox.Name = "industryListGroupBox";
-            this.industryListGroupBox.Size = new System.Drawing.Size(559, 561);
+            this.industryListGroupBox.Size = new System.Drawing.Size(559, 536);
             this.industryListGroupBox.TabIndex = 1;
             this.industryListGroupBox.TabStop = false;
             this.industryListGroupBox.Text = "Industries";
@@ -183,7 +185,7 @@
             this.editingPanelGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.editingPanelGroupBox.Location = new System.Drawing.Point(0, 0);
             this.editingPanelGroupBox.Name = "editingPanelGroupBox";
-            this.editingPanelGroupBox.Size = new System.Drawing.Size(501, 561);
+            this.editingPanelGroupBox.Size = new System.Drawing.Size(501, 536);
             this.editingPanelGroupBox.TabIndex = 2;
             this.editingPanelGroupBox.TabStop = false;
             this.editingPanelGroupBox.Text = "EditingPanel";
@@ -198,7 +200,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(1064, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
-            this.toolStrip1.Visible = false;
             // 
             // toolStripDropDownButton1
             // 
@@ -206,6 +207,7 @@
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.closeToolStripMenuItem,
+            this.saveToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -227,6 +229,13 @@
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
@@ -234,14 +243,19 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "ind";
+            this.saveFileDialog1.Filter = "IND|*.ind";
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1064, 561);
-            this.Controls.Add(this.panelLoadFile);
             this.Controls.Add(this.panelData);
+            this.Controls.Add(this.panelLoadFile);
             this.Controls.Add(this.toolStrip1);
             this.Name = "MainForm";
             this.Text = "Run8 Industry Configuration Editor";
@@ -281,5 +295,7 @@
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ProgressBar progressBar1;
         private Label label1;
+        private ToolStripMenuItem saveToolStripMenuItem;
+        private SaveFileDialog saveFileDialog1;
     }
 }

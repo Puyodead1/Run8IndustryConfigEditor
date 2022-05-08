@@ -2,44 +2,60 @@
 {
     public class Car
     {
+        
         public Car(BinaryReader binaryReader)
         {
-            int num = binaryReader.ReadInt32();
+            Num = binaryReader.ReadInt32();
             CarType = (ECarType)binaryReader.ReadByte();
-            //System.Diagnostics.Debug.WriteLine($"CarCount: {CarType}");
             bool_0 = binaryReader.ReadBoolean();
-            //System.Diagnostics.Debug.WriteLine($"bool_0: {bool_0}");
             Time = binaryReader.ReadInt32();
-            //System.Diagnostics.Debug.WriteLine($"Time: {Time}");
             Capacity = binaryReader.ReadInt32();
-            //System.Diagnostics.Debug.WriteLine($"Capacity: {Capacity}");
             DestinationCount = binaryReader.ReadInt32();
-            //System.Diagnostics.Debug.WriteLine($"DestinationCount: {DestinationCount}");
             this.Destinations = new List<string>(DestinationCount);
             for (int i = 0; i < DestinationCount; i++)
             {
-                string d = IndustryConfiguration.ReadString(binaryReader);
-                Destinations.Add(d);
-                //System.Diagnostics.Debug.WriteLine($"d: {d}");
+                Destinations.Add(IndustryConfiguration.ReadString(binaryReader));
             }
-            //System.Diagnostics.Debug.WriteLine($"Loaded {Destinations.Count} destinations");
-            if(num >= 2)
+
+            DefList = new List<string>();
+            if (Num >= 2)
             {
-                int num2 = binaryReader.ReadInt32();
-                //System.Diagnostics.Debug.WriteLine($"num2: {num2}");
-                for (int j = 0; j < num2; j++)
+                Num2 = binaryReader.ReadInt32();
+                for (int j = 0; j < Num2; j++)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Unknown String j{j}: {IndustryConfiguration.ReadString(binaryReader)}");
+                    DefList.Add(IndustryConfiguration.ReadString(binaryReader));
                 }
             }
         }
 
-        public int Num { get; set; }
-        public ECarType CarType { get; set; }
-        public bool bool_0 { get; set; }
-        public int Time { get; set; }
-        public int Capacity { get; set; }
-        public int DestinationCount { get; set; }
+        public void Save(BinaryWriter writer)
+        {
+            writer.Write(Num);
+            writer.Write((byte)CarType);
+            writer.Write(bool_0);
+            writer.Write(Time);
+            writer.Write(Capacity);
+            writer.Write(DestinationCount);
+            foreach(string d in Destinations)
+            {
+                IndustryConfiguration.WriteString(writer, d);
+            }
+
+            writer.Write(Num2);
+            foreach(string d in DefList)
+            {
+                IndustryConfiguration.WriteString(writer, d);
+            }
+        }
+
+        private int Num;
+        private int Num2;
+        public ECarType CarType;
+        public bool bool_0;
+        public int Time;
+        public int Capacity;
+        public int DestinationCount;
         public List<string> Destinations;
+        private List<string> DefList;
     }
 }

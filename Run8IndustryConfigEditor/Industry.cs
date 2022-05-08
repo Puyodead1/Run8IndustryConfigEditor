@@ -43,6 +43,27 @@
 
             //System.Diagnostics.Debug.WriteLine($"Loaded {Cars.Count} cars for {Name}");
         }
+
+        public void Save(BinaryWriter writer)
+        {
+            // write the skip bytes
+            writer.Write(0);
+            IndustryConfiguration.WriteString(writer, Name);
+            IndustryConfiguration.WriteString(writer, LocalFreightCode);
+            IndustryConfiguration.WriteString(writer, Tag);
+            writer.Write(Unknown);
+            writer.Write(TrackCount);
+            foreach(Track track in Tracks)
+            {
+                track.Save(writer);
+            }
+            writer.Write(CarCount);
+            foreach(Car car in Cars)
+            {
+                car.Save(writer);
+            }
+        }
+
         public string Name { get; set; }
         public string LocalFreightCode { get; set; }
         public string Tag { get; set; }

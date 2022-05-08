@@ -14,6 +14,15 @@
             //System.Diagnostics.Debug.WriteLine($"Node: {Node}");
         }
 
+        public void Save(BinaryWriter writer)
+        {
+            // write skip bytes
+            writer.Write(0);
+            writer.Write(Prefix);
+            writer.Write(Section);
+            writer.Write(Node);
+        }
+
         public int Prefix { get; set; }
         public int Section { get; set; }
         public int Node { get; set; }
