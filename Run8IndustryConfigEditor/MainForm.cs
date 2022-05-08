@@ -82,17 +82,43 @@ namespace Run8IndustryConfigEditor
             deleteRowBtnCol.Text = "Delete";
             deleteRowBtnCol.UseColumnTextForButtonValue = true;
 
-            industryGrid.Columns.Add("tag", "Industry Tag");
-            industryGrid.Columns.Add("name", "Industry Name");
-            industryGrid.Columns.Add("localFreightCode", "Local Freight Code");
-            industryGrid.Columns.Add("trackCount", "Track Count");
-            industryGrid.Columns.Add("carCount", "Car Count");
+            DataGridViewTextBoxColumn industryTagCol = new DataGridViewTextBoxColumn();
+            industryTagCol.HeaderText = "Industry Tag";
+            industryTagCol.Name = "industryTag";
+            industryTagCol.MaxInputLength = 4;
+
+            DataGridViewTextBoxColumn industryNameCol = new DataGridViewTextBoxColumn();
+            industryNameCol.HeaderText = "Industry Name";
+            industryNameCol.Name = "industryName";
+            industryNameCol.MaxInputLength = 255;
+
+            DataGridViewTextBoxColumn localFreightCodeCol = new DataGridViewTextBoxColumn();
+            localFreightCodeCol.HeaderText = "Local Freight Code";
+            localFreightCodeCol.Name = "localFreightCode";
+            localFreightCodeCol.ReadOnly = true;
+
+            DataGridViewTextBoxColumn trackCountCol = new DataGridViewTextBoxColumn();
+            trackCountCol.HeaderText = "Track Count";
+            trackCountCol.Name = "trackCount";
+            trackCountCol.ReadOnly = true;
+
+            DataGridViewTextBoxColumn carCountCol = new DataGridViewTextBoxColumn();
+            carCountCol.HeaderText = "Car Count";
+            carCountCol.Name = "carCount";
+            carCountCol.ReadOnly = true;
+
+            industryGrid.Columns.Add(industryTagCol);
+            industryGrid.Columns.Add(industryNameCol);
+            industryGrid.Columns.Add(localFreightCodeCol);
+            industryGrid.Columns.Add(trackCountCol);
+            industryGrid.Columns.Add(carCountCol);
 
             industryGrid.Columns.Add(trackEditBtnCol);
             industryGrid.Columns.Add(carsEditBtnCol);
             industryGrid.Columns.Add(deleteRowBtnCol);
         }
 
+        // clears the editing panel and resets it
         private void ResetEditingPanel()
         {
             // clear any existing data
@@ -109,11 +135,25 @@ namespace Run8IndustryConfigEditor
             // clear any existing data
             ResetEditingPanel();
 
+            DataGridViewComboBoxColumn carTypeCol = new DataGridViewComboBoxColumn();
+            carTypeCol.HeaderText = "Car Type";
+            carTypeCol.Name = "carType";
+            foreach(ECarType eCarType in Enum.GetValues(typeof(ECarType)))
+            {
+                if (eCarType == ECarType.All || eCarType == ECarType.Loco || eCarType == ECarType.Shoving_Platform) continue;
+                carTypeCol.Items.Add(eCarType.ToString());
+            }
+
+            DataGridViewTextBoxColumn destinationCountCol = new DataGridViewTextBoxColumn();
+            destinationCountCol.HeaderText = "Destination Count";
+            destinationCountCol.Name = "destCount";
+            destinationCountCol.ReadOnly = true;
+
             editingPanel.Name = "cars";
-            editingPanel.Columns.Add("carType", "Type");
+            editingPanel.Columns.Add(carTypeCol);
             editingPanel.Columns.Add("time", "Time");
             editingPanel.Columns.Add("capacity", "Capacity");
-            editingPanel.Columns.Add("destCount", "Destination Count");
+            editingPanel.Columns.Add(destinationCountCol);
             editingPanel.Columns.Add("dests", "Destinations");
 
             for (int i = 0; i < industry.CarCount; i++)
@@ -167,6 +207,7 @@ namespace Run8IndustryConfigEditor
             editingPanelGroupBox.Visible = true;
         }
 
+        // Clears all the grids data and resets them
         private void ClearGrids()
         {
             industryGrid.Columns.Clear();
@@ -196,6 +237,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // Event to handle Load File button being clicked
         private void button1_Click(object sender, EventArgs e)
         {
             btnLoadFile.Enabled = false;
@@ -209,6 +251,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // Threaded method for loading a file
         private void LoadFile()
         {
             if (filePath == null) return;
@@ -239,6 +282,7 @@ namespace Run8IndustryConfigEditor
             }));
         }
 
+        // Event to handle when file is opened in dialog
         private void openFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
             try
@@ -255,6 +299,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // event to handle button cell clicks
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if(industryConfiguration == null)
@@ -294,6 +339,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // event to handle then open button being clicked in the toolstrip
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ClearGrids();
@@ -305,6 +351,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // event to handle then close button being clicked in the toolstrip
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ClearGrids();
@@ -312,12 +359,14 @@ namespace Run8IndustryConfigEditor
             panelData.Visible = false;
         }
 
+        // event to handle then about button being clicked in the toolstrip
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutBox aboutBox = new AboutBox();
             aboutBox.ShowDialog(this);
         }
 
+        // event to handle hiding and showing the toolstrip so it only shows on the editing screen
         private void panelLoadFile_VisibleChanged(object sender, EventArgs e)
         {
             if(!panelLoadFile.Visible)
@@ -331,6 +380,7 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // event to handle drag and drop event
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data == null) return;
@@ -352,11 +402,13 @@ namespace Run8IndustryConfigEditor
             }
         }
 
+        // event to handle drag and drop file entering
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
             if(e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
 
+        // event to handle then save button being clicked in the toolstrip
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if(saveFileDialog1.ShowDialog() == DialogResult.OK)
