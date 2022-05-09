@@ -20,33 +20,24 @@ jobs:
       run: dotnet restore
     - name: Publish x64
       run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE64 --sc -f net6.0-windows -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-    - name: Publish x86
-      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE86 --sc -f net6.0-windows -r win-x86 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
     - name: Publish x64
       run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE64Slim --no-self-contained -f net6.0-windows -r win-x64
-    - name: Publish x86
-      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE86Slim --no-self-contained -f net6.0-windows -r win-x86
     - name: Upload x64 Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RICE64
         path: RICE64/**
-        if-no-files-found: error
-    - name: Upload x86 Build Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: RICE86
-        path: RICE86/**
-        if-no-files-found: error
+        if-no-files-found: warn
     - name: Upload x64 Slim Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RICE64Slim
         path: RICE64Slim/**
-        if-no-files-found: error
-    - name: Upload x86 Slim Build Artifacts
+        if-no-files-found: warn
+    - name: Build Installer
+      run: devenv Run8IndustryConfigEditor.sln /Project Setup\Setup.vdproj /Build "Release"
+    - name: Upload x64 Installer Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: RICE86Slim
-        path: RICE86Slim/**
-        if-no-files-found: error
+        name: Setup.msi
+        path: Setup/Release/Setup.msi

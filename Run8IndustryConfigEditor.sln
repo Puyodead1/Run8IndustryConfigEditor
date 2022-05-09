@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Run8IndustryConfigEditor", 
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "WAP", "WAP\WAP.wapproj", "{70289035-BCAD-4873-B295-F12E32D66F74}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{70289035-BCAD-4873-B295-F12E32D66F74}.Release|x86.ActiveCfg = Release|x86
 		{70289035-BCAD-4873-B295-F12E32D66F74}.Release|x86.Build.0 = Release|x86
 		{70289035-BCAD-4873-B295-F12E32D66F74}.Release|x86.Deploy.0 = Release|x86
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Debug|Any CPU.ActiveCfg = Debug
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Debug|ARM.ActiveCfg = Debug
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Debug|ARM64.ActiveCfg = Debug
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Debug|x64.ActiveCfg = Debug
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Debug|x86.ActiveCfg = Debug
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Release|Any CPU.ActiveCfg = Release
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Release|ARM.ActiveCfg = Release
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Release|ARM64.ActiveCfg = Release
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Release|x64.ActiveCfg = Release
+		{1EEFDDBD-43DB-48FC-8CB0-D4DD3D7C30BD}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
