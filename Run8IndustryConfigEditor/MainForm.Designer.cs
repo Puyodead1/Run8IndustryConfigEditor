@@ -128,6 +128,8 @@
             this.industryGrid.Size = new System.Drawing.Size(560, 561);
             this.industryGrid.TabIndex = 0;
             this.industryGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            this.industryGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.industryGrid_CellEndEdit);
+            this.industryGrid.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.industryGrid_UserDeletingRow);
             // 
             // editingPanel
             // 
@@ -148,6 +150,8 @@
             this.editingPanel.RowTemplate.Height = 25;
             this.editingPanel.Size = new System.Drawing.Size(495, 514);
             this.editingPanel.TabIndex = 1;
+            this.editingPanel.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.editingPanel_CellEndEdit);
+            this.editingPanel.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.editingPanel_UserDeletingRow);
             // 
             // panelData
             // 

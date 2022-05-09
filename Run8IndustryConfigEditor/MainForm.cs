@@ -6,6 +6,9 @@ namespace Run8IndustryConfigEditor
     {
         public string? filePath;
         public IndustryConfiguration? industryConfiguration;
+        private int currentEditingType = -1;
+        private Industry? currentEditingIndustry;
+
         public MainForm()
         {
             InitializeComponent();
@@ -76,12 +79,6 @@ namespace Run8IndustryConfigEditor
             carsEditBtnCol.Text = "Edit Cars";
             carsEditBtnCol.UseColumnTextForButtonValue = true;
 
-            DataGridViewButtonColumn deleteRowBtnCol = new DataGridViewButtonColumn();
-            deleteRowBtnCol.HeaderText = "Delete";
-            deleteRowBtnCol.Name = "deleteRow";
-            deleteRowBtnCol.Text = "Delete";
-            deleteRowBtnCol.UseColumnTextForButtonValue = true;
-
             DataGridViewTextBoxColumn industryTagCol = new DataGridViewTextBoxColumn();
             industryTagCol.HeaderText = "Industry Tag";
             industryTagCol.Name = "industryTag";
@@ -115,7 +112,6 @@ namespace Run8IndustryConfigEditor
 
             industryGrid.Columns.Add(trackEditBtnCol);
             industryGrid.Columns.Add(carsEditBtnCol);
-            industryGrid.Columns.Add(deleteRowBtnCol);
         }
 
         // clears the editing panel and resets it
@@ -125,6 +121,10 @@ namespace Run8IndustryConfigEditor
             editingPanel.Columns.Clear();
             editingPanel.Rows.Clear();
             editingPanel.ClearSelection();
+            currentEditingType = -1;
+            currentEditingIndustry = null;
+            editingPanel.ReadOnly = false;
+            editingPanelGroupBox.Visible = false;
         }
 
         /*
@@ -134,6 +134,8 @@ namespace Run8IndustryConfigEditor
         {
             // clear any existing data
             ResetEditingPanel();
+            currentEditingType = 0;
+            currentEditingIndustry = industry;
 
             DataGridViewComboBoxColumn carTypeCol = new DataGridViewComboBoxColumn();
             carTypeCol.HeaderText = "Car Type";
@@ -150,6 +152,7 @@ namespace Run8IndustryConfigEditor
             destinationCountCol.ReadOnly = true;
 
             editingPanel.Name = "cars";
+           
             editingPanel.Columns.Add(carTypeCol);
             editingPanel.Columns.Add("time", "Time");
             editingPanel.Columns.Add("capacity", "Capacity");
@@ -183,8 +186,11 @@ namespace Run8IndustryConfigEditor
         {
             // clear any existing data
             ResetEditingPanel();
+            currentEditingType = 1;
+            currentEditingIndustry = industry;
 
             editingPanel.Name = "tracks";
+            editingPanel.ReadOnly = true;
             editingPanel.Columns.Add("prefix", "Prefix");
             editingPanel.Columns.Add("section", "Section");
             editingPanel.Columns.Add("node", "Node");
@@ -309,10 +315,9 @@ namespace Run8IndustryConfigEditor
             }
             int editCarIndex = industryGrid.Columns["editCars"].Index;
             int editTracksIndex = industryGrid.Columns["editTracks"].Index;
-            int deleteIndex = industryGrid.Columns["deleteRow"].Index;
 
             // ignore cells that arent button cells
-            if (e.RowIndex < 0 || (e.ColumnIndex != editCarIndex && e.ColumnIndex != editTracksIndex && e.ColumnIndex != deleteIndex)) return;
+            if (e.RowIndex < 0 || (e.ColumnIndex != editCarIndex && e.ColumnIndex != editTracksIndex)) return;
 
             Industry industry = industryConfiguration.Industries[e.RowIndex];
 
@@ -322,17 +327,7 @@ namespace Run8IndustryConfigEditor
             } else if (e.ColumnIndex == editCarIndex)
             {
                 SetupCarEditor(industry);
-            } else if (e.ColumnIndex == deleteIndex)
-            {
-                DialogResult res = MessageBox.Show("you won't be able to undo it without loosing your changes", "are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-                if(res == DialogResult.Yes)
-                {
-                    // remove from grid
-                    industryGrid.Rows.RemoveAt(e.RowIndex);
-                    // remove from industry config
-                    industryConfiguration.Industries.RemoveAt(e.ColumnIndex);
-                }
-            } 
+            }
             else
             {
                 MessageBox.Show($"invalid operation x_x");
@@ -434,6 +429,141 @@ namespace Run8IndustryConfigEditor
                     MessageBox.Show("Oops", "There is nothing to save...", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
+        }
+
+        private void industryGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (industryConfiguration == null) return;
+
+            DataGridViewCell cell = industryGrid[e.ColumnIndex, e.RowIndex];
+            Industry industry = industryConfiguration.Industries[e.RowIndex];
+            
+            switch(cell.ColumnIndex)
+            {
+                case 0:
+                    industry.Tag = (string)cell.Value;
+                    break;
+                case 1:
+                    industry.Name = (string)cell.Value;
+                    break;
+            }
+        }
+
+        private void editingPanel_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (currentEditingIndustry == null || currentEditingType == -1) return;
+
+            DataGridViewCell cell = editingPanel[e.ColumnIndex, e.RowIndex];
+
+            if(currentEditingType == 0)
+            {
+                Car car = currentEditingIndustry.Cars[cell.RowIndex];
+                // car editing
+                switch(cell.ColumnIndex)
+                {
+                    case 0:
+                        car.CarType = (ECarType)Enum.Parse(typeof(Car), (string)cell.Value);
+                        break;
+                    case 1:
+                        car.Time = int.Parse((string)cell.Value);
+                        break;
+                    case 2:
+                        car.Capacity = int.Parse((string)cell.Value);
+                        break;
+                    case 4:
+                        car.Destinations = ((string)cell.Value).Split(",").ToList();
+                        // remove any spaces and capitalize
+                        car.Destinations.ForEach(v =>
+                        {
+                            v.Trim();
+                            v.ToUpper();
+                        });
+                        // update destination count in data
+                        car.DestinationCount = car.Destinations.Count;
+                        // update destination count in grid
+                        editingPanel[3, cell.RowIndex].Value = car.DestinationCount;
+                        break;
+                }
+            } else if (currentEditingType == 1)
+            {
+                // track editing
+                // TODO
+            }
+        }
+
+        private void industryGrid_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        {
+            if (industryConfiguration == null)
+            {
+                System.Diagnostics.Debug.WriteLine("IndustryConfiguration was null somehow..");
+                return;
+            }
+
+            // remove from industry config
+            industryConfiguration.Industries.RemoveAt(e.Row.Index);
+        }
+
+        private void editingPanel_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            if (industryConfiguration == null)
+            {
+                System.Diagnostics.Debug.WriteLine("industryconfiguration was null");
+                return;
+            }
+
+            if (currentEditingIndustry == null)
+            {
+                System.Diagnostics.Debug.WriteLine("no current editing industry, wtf");
+                return;
+            }
+
+            if(e.Row == null)
+            {
+                System.Diagnostics.Debug.WriteLine("row was null");
+                return;
+            }
+
+            int industryIndex = industryConfiguration.Industries.IndexOf(currentEditingIndustry);
+
+            switch (currentEditingType)
+            {
+                case 0:
+                    // remove car from industry
+                    currentEditingIndustry.Cars.RemoveAt(e.Row.Index);
+                    currentEditingIndustry.CarCount = currentEditingIndustry.Cars.Count();
+                    industryGrid.Rows[industryIndex].Cells[4].Value = currentEditingIndustry.CarCount.ToString();
+                    break;
+                case 1:
+                    // remove track from industry
+                    currentEditingIndustry.Tracks.RemoveAt(e.Row.Index);
+                    currentEditingIndustry.TrackCount = currentEditingIndustry.Tracks.Count();
+                    industryGrid.Rows[industryIndex].Cells[3].Value = currentEditingIndustry.TrackCount.ToString();
+                    break;
+            }
+        }
+
+        private void industryGrid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            if (industryConfiguration == null)
+            {
+                System.Diagnostics.Debug.WriteLine("IndustryConfiguration was null somehow..");
+                return;
+            }
+
+            if (e.Row == null)
+            {
+                System.Diagnostics.Debug.WriteLine("row was null");
+                return;
+            }
+
+            if(industryConfiguration.Industries[e.Row.Index] == currentEditingIndustry)
+            {
+                // the industry being edited was deleted, clear the editing grid
+                ResetEditingPanel();
+            }
+
+            // remove from industry config
+            industryConfiguration.Industries.RemoveAt(e.Row.Index);
         }
     }
 }
