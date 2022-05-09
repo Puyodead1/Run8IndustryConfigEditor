@@ -30,23 +30,23 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RICE64
-        path: Run8IndustryConfigEditor/RICE64/**
+        path: RICE64/**
         if-no-files-found: error
     - name: Upload x86 Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RICE86
-        path: Run8IndustryConfigEditor/RICE86/**
+        path: RICE86/**
         if-no-files-found: error
     - name: Upload x64 Slim Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RICE64Slim
-        path: Run8IndustryConfigEditor/RICE64Slim/**
+        path: RICE64Slim/**
         if-no-files-found: error
     - name: Upload x86 Slim Build Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: RICE86Slim
-        path: Run8IndustryConfigEditor/RICE86Slim/**
+        path: RICE86Slim/**
         if-no-files-found: error
