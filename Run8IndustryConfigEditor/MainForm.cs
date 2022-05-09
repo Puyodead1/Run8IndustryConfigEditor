@@ -169,7 +169,7 @@ namespace Run8IndustryConfigEditor
                     car.Time.ToString(),
                     car.Capacity.ToString(),
                     car.DestinationCount.ToString(),
-                    String.Join(", ", car.Destinations)
+                    String.Join(",", car.Destinations)
                 };
                 editingPanel.Rows.Add(s);
             }
