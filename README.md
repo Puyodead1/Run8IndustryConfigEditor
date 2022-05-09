@@ -4,4 +4,8 @@ Windows desktop application for viewing and modifying Run8 Train Simulator V3 In
 This is a work in progress, along with other Run8 modding tools.
 
 
+You can find development builds in [GitHub Actions](/actions).
+Slim builds are just the application without .NET, Full builds include everything
+
+
 If you are a developer, I have published some File Format information for Run8 V3 [here](https://gist.github.com/Puyodead1/ffc7fcf943d248c35be1fbcb2477355b).
