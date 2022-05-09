@@ -1,0 +1,52 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    if: "! contains(toJSON(github.event.commits.*.message), '[ci skip]')"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Publish x64
+      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE64 --sc -f net6.0-windows -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+    - name: Publish x86
+      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE86 --sc -f net6.0-windows -r win-x86 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+    - name: Publish x64
+      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE64Slim --no-self-contained -f net6.0-windows -r win-x64
+    - name: Publish x86
+      run: dotnet publish Run8IndustryConfigEditor/Run8IndustryConfigEditor.csproj -c Release -o RICE86Slim --no-self-contained -f net6.0-windows -r win-x86
+    - name: Upload x64 Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: RICE64
+        path: Run8IndustryConfigEditor/RICE64/**
+        if-no-files-found: error
+    - name: Upload x86 Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: RICE86
+        path: Run8IndustryConfigEditor/RICE86/**
+        if-no-files-found: error
+    - name: Upload x64 Slim Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: RICE64Slim
+        path: Run8IndustryConfigEditor/RICE64Slim/**
+        if-no-files-found: error
+    - name: Upload x86 Slim Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: RICE86Slim
+        path: Run8IndustryConfigEditor/RICE86Slim/**
+        if-no-files-found: error

@@ -396,3 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+WAP/
+SigningCertificate.pfx
+SigningCertificate_Encoded.txt
