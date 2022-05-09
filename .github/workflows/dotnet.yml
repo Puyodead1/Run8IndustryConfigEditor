@@ -34,10 +34,3 @@ jobs:
         name: RICE64Slim
         path: RICE64Slim/**
         if-no-files-found: warn
-    - name: Build Installer
-      run: devenv Run8IndustryConfigEditor.sln /Project Setup\Setup.vdproj /Build "Release"
-    - name: Upload x64 Installer Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: Setup.msi
-        path: Setup/Release/Setup.msi
